@@ -1,15 +1,28 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Windows.Forms;
 using System.Xml.Linq;
+using Label = System.Windows.Forms.Label;
 
 namespace DarknessFallsInstaller {
     public class InstallData : INotifyPropertyChanged {
 
+        static List<string> allowedMods = new List<string>() {
+            "TFP_CommandExtensions", "TFP_MapRendering", "TFP_WebServer", "Xample_MarkersMod"
+        };
+
+        static string modFiles = ".\\ModFiles";
+
         public string InstallDir { get => _installDir; set { _installDir = value; OnPropertyChanged("InstallDir"); IsGameVersionCorrect(); } }
         public bool IsComplete { get; set; }
         public bool IsNewInstall { get; set; }
+
+        public string WorkingFile { get => _workingFile; set { _workingFile = value; OnPropertyChanged("WorkingFile"); } }
 
         public string NewInstallDir { get => _newInstallDir; set { _newInstallDir = value; OnPropertyChanged("NewInstallDir"); } }
 
@@ -18,12 +31,14 @@ namespace DarknessFallsInstaller {
         private string _installDir;
         private string _newInstallDir;
         private bool _isGameVersionCorrect;
+        private string _workingFile;
 
         public InstallData(string installDir = "", bool isComplete = false, bool isNewInstall = false) {
             InstallDir = installDir;
             IsComplete = isComplete;
             IsNewInstall = isNewInstall;
             IsGameVersionValid = false;
+            WorkingFile = string.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -33,11 +48,16 @@ namespace DarknessFallsInstaller {
         }
 
         public bool CheckForPreviousMods() {
+            return Directory.Exists(InstallDir + "\\Mods");
+        }
 
-            if (Directory.Exists(InstallDir + "\\Mods")) {
-                return true;
+        public void RemoveExistingMods() {
+
+            foreach (var subDir in new DirectoryInfo(InstallDir).GetDirectories()) {
+                if (!allowedMods.Contains(subDir.Name)) {
+                    subDir.Delete(true);
+                }
             }
-            return false;
         }
 
         public bool IsNewInstallFolderEmpty() {
@@ -50,6 +70,7 @@ namespace DarknessFallsInstaller {
             DirectoryInfo directory = new DirectoryInfo(NewInstallDir);
 
             foreach (FileInfo file in directory.GetFiles()) {
+                WorkingFile = "Copying " + file.Name;
                 file.Delete();
             }
 
@@ -58,14 +79,39 @@ namespace DarknessFallsInstaller {
             }
         }
 
-        public void CloneBaseGame() {
+        public void CloneBaseGame(IProgress<int> progress) {
+
+            int i = 0;
+            int total = Directory.GetFiles(InstallDir, "*.*", SearchOption.AllDirectories).Length;
 
             foreach (string dirPath in Directory.GetDirectories(InstallDir, "*", SearchOption.AllDirectories)) {
+                if (dirPath.Substring(dirPath.Length - 4, 4).Equals("Mods")) continue;
                 Directory.CreateDirectory(dirPath.Replace(InstallDir, NewInstallDir));
             }
 
             foreach (string newPath in Directory.GetFiles(InstallDir, "*.*", SearchOption.AllDirectories)) {
+                //if (newPath.Contains("Mods")) continue;
                 File.Copy(newPath, newPath.Replace(InstallDir, NewInstallDir), true);
+                WorkingFile = "Copying " + newPath;
+                progress.Report((i + 1) * 100 / total);
+                i++;
+            }
+        }
+
+        public void InstallModFiles(IProgress<int> progress) {
+
+            int i = 0;
+            int total = Directory.GetFiles(modFiles, "*.*", SearchOption.AllDirectories).Length;
+
+            foreach (string dirPath in Directory.GetDirectories(modFiles, "*", SearchOption.AllDirectories)) {
+                Directory.CreateDirectory(dirPath.Replace(modFiles, NewInstallDir));
+            }
+
+            foreach (string newPath in Directory.GetFiles(modFiles, "*.*", SearchOption.AllDirectories)) {
+                File.Copy(newPath, newPath.Replace(modFiles, NewInstallDir), true);
+                WorkingFile = "Copying " + newPath;
+                progress.Report((i + 1) * 100 / total);
+                i++;
             }
         }
 

@@ -23,10 +23,9 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainInstaller));
             this.mainLabel = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
+            this.installDesc = new System.Windows.Forms.Label();
             this.pathBox = new System.Windows.Forms.TextBox();
             this.browseButton = new System.Windows.Forms.Button();
             this.nextButton = new System.Windows.Forms.Button();
@@ -40,18 +39,25 @@
             this.warningNonEmptyInstallDesc = new System.Windows.Forms.Label();
             this.warningNonEmptyInstall = new System.Windows.Forms.Label();
             this.separateInstallDesc = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.separateInstallLabel = new System.Windows.Forms.Label();
             this.sepInstallLabel = new System.Windows.Forms.Label();
             this.buttonBrowseSepInstall = new System.Windows.Forms.Button();
             this.installDirTextbox = new System.Windows.Forms.TextBox();
             this.createInstallCheck = new System.Windows.Forms.CheckBox();
-            this.mainInstallerBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.existingModsFolderLabel = new System.Windows.Forms.Panel();
+            this.warningExistingMods = new System.Windows.Forms.Label();
+            this.existingModsWarningDesc = new System.Windows.Forms.Label();
+            this.existingModsButtonOk = new System.Windows.Forms.Button();
+            this.installerProgressPanel = new System.Windows.Forms.Panel();
+            this.installProgressBar = new System.Windows.Forms.ProgressBar();
+            this.installingDFLabel = new System.Windows.Forms.Label();
+            this.stepLabel = new System.Windows.Forms.Label();
+            this.workingFileLabel = new System.Windows.Forms.Label();
             this.gameVersionWarning.SuspendLayout();
             this.mainInstallPanel.SuspendLayout();
             this.nonEmptyInstallWarningPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainInstallerBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
+            this.existingModsFolderLabel.SuspendLayout();
+            this.installerProgressPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainLabel
@@ -64,14 +70,14 @@
             this.mainLabel.TabIndex = 0;
             this.mainLabel.Text = "Select Installation Folder";
             // 
-            // label1
+            // installDesc
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 69);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(489, 26);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "The installer will install Darkness Falls. The installer found a compatible 7D2D " +
+            this.installDesc.AutoSize = true;
+            this.installDesc.Location = new System.Drawing.Point(13, 69);
+            this.installDesc.Name = "installDesc";
+            this.installDesc.Size = new System.Drawing.Size(489, 26);
+            this.installDesc.TabIndex = 1;
+            this.installDesc.Text = "The installer will install Darkness Falls. The installer found a compatible 7D2D " +
     "at the following location. \r\nClick next to install to this folder or browse to s" +
     "elect a different folder.  ";
             // 
@@ -140,9 +146,10 @@
             // 
             // mainInstallPanel
             // 
+            this.mainInstallPanel.Controls.Add(this.existingModsFolderLabel);
             this.mainInstallPanel.Controls.Add(this.nonEmptyInstallWarningPanel);
             this.mainInstallPanel.Controls.Add(this.separateInstallDesc);
-            this.mainInstallPanel.Controls.Add(this.label2);
+            this.mainInstallPanel.Controls.Add(this.separateInstallLabel);
             this.mainInstallPanel.Controls.Add(this.sepInstallLabel);
             this.mainInstallPanel.Controls.Add(this.buttonBrowseSepInstall);
             this.mainInstallPanel.Controls.Add(this.installDirTextbox);
@@ -150,7 +157,7 @@
             this.mainInstallPanel.Controls.Add(this.gameVersionWarning);
             this.mainInstallPanel.Controls.Add(this.browseButton);
             this.mainInstallPanel.Controls.Add(this.pathBox);
-            this.mainInstallPanel.Controls.Add(this.label1);
+            this.mainInstallPanel.Controls.Add(this.installDesc);
             this.mainInstallPanel.Controls.Add(this.mainLabel);
             this.mainInstallPanel.Location = new System.Drawing.Point(0, 0);
             this.mainInstallPanel.Name = "mainInstallPanel";
@@ -208,15 +215,15 @@
             this.separateInstallDesc.Text = "A separate install will create a copy of the game files using the location above " +
     "and then install\r\nthe Darkness Falls files into this copy.\r\n";
             // 
-            // label2
+            // separateInstallLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(13, 202);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(287, 25);
-            this.label2.TabIndex = 10;
-            this.label2.Text = "Create a separate game install?";
+            this.separateInstallLabel.AutoSize = true;
+            this.separateInstallLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.separateInstallLabel.Location = new System.Drawing.Point(13, 202);
+            this.separateInstallLabel.Name = "separateInstallLabel";
+            this.separateInstallLabel.Size = new System.Drawing.Size(287, 25);
+            this.separateInstallLabel.TabIndex = 10;
+            this.separateInstallLabel.Text = "Create a separate game install?";
             // 
             // sepInstallLabel
             // 
@@ -257,19 +264,104 @@
             this.createInstallCheck.UseVisualStyleBackColor = true;
             this.createInstallCheck.CheckedChanged += new System.EventHandler(this.createInstallCheck_CheckedChanged);
             // 
-            // mainInstallerBindingSource
+            // existingModsFolderLabel
             // 
-            this.mainInstallerBindingSource.DataSource = typeof(DarknessFallsInstaller.MainInstaller);
+            this.existingModsFolderLabel.Controls.Add(this.existingModsButtonOk);
+            this.existingModsFolderLabel.Controls.Add(this.existingModsWarningDesc);
+            this.existingModsFolderLabel.Controls.Add(this.warningExistingMods);
+            this.existingModsFolderLabel.Location = new System.Drawing.Point(61, 35);
+            this.existingModsFolderLabel.Name = "existingModsFolderLabel";
+            this.existingModsFolderLabel.Size = new System.Drawing.Size(379, 169);
+            this.existingModsFolderLabel.TabIndex = 8;
             // 
-            // bindingSource1
+            // warningExistingMods
             // 
-            this.bindingSource1.DataSource = typeof(DarknessFallsInstaller.Program);
+            this.warningExistingMods.AutoSize = true;
+            this.warningExistingMods.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.warningExistingMods.Location = new System.Drawing.Point(134, 9);
+            this.warningExistingMods.Name = "warningExistingMods";
+            this.warningExistingMods.Size = new System.Drawing.Size(114, 31);
+            this.warningExistingMods.TabIndex = 0;
+            this.warningExistingMods.Text = "Warning";
+            // 
+            // existingModsWarningDesc
+            // 
+            this.existingModsWarningDesc.AutoSize = true;
+            this.existingModsWarningDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.existingModsWarningDesc.Location = new System.Drawing.Point(3, 45);
+            this.existingModsWarningDesc.Name = "existingModsWarningDesc";
+            this.existingModsWarningDesc.Size = new System.Drawing.Size(376, 51);
+            this.existingModsWarningDesc.TabIndex = 1;
+            this.existingModsWarningDesc.Text = "An existing mods folder was found in this game install.\r\nIf you do not choose to " +
+    "create a separate install, this mods\r\nfolder will be removed before Darkness Fal" +
+    "ls is installed.";
+            // 
+            // existingModsButtonOk
+            // 
+            this.existingModsButtonOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.existingModsButtonOk.Location = new System.Drawing.Point(151, 119);
+            this.existingModsButtonOk.Name = "existingModsButtonOk";
+            this.existingModsButtonOk.Size = new System.Drawing.Size(75, 28);
+            this.existingModsButtonOk.TabIndex = 2;
+            this.existingModsButtonOk.Text = "Ok";
+            this.existingModsButtonOk.UseVisualStyleBackColor = true;
+            this.existingModsButtonOk.Click += new System.EventHandler(this.existingModsButtonOk_Click);
+            // 
+            // installerProgressPanel
+            // 
+            this.installerProgressPanel.Controls.Add(this.workingFileLabel);
+            this.installerProgressPanel.Controls.Add(this.stepLabel);
+            this.installerProgressPanel.Controls.Add(this.installingDFLabel);
+            this.installerProgressPanel.Controls.Add(this.installProgressBar);
+            this.installerProgressPanel.Location = new System.Drawing.Point(0, 0);
+            this.installerProgressPanel.Name = "installerProgressPanel";
+            this.installerProgressPanel.Size = new System.Drawing.Size(536, 366);
+            this.installerProgressPanel.TabIndex = 7;
+            // 
+            // installProgressBar
+            // 
+            this.installProgressBar.Location = new System.Drawing.Point(51, 202);
+            this.installProgressBar.Name = "installProgressBar";
+            this.installProgressBar.Size = new System.Drawing.Size(424, 23);
+            this.installProgressBar.Step = 1;
+            this.installProgressBar.TabIndex = 0;
+            // 
+            // installingDFLabel
+            // 
+            this.installingDFLabel.AutoSize = true;
+            this.installingDFLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.installingDFLabel.Location = new System.Drawing.Point(17, 10);
+            this.installingDFLabel.Name = "installingDFLabel";
+            this.installingDFLabel.Size = new System.Drawing.Size(310, 31);
+            this.installingDFLabel.TabIndex = 1;
+            this.installingDFLabel.Text = "Installing Darkness Falls";
+            // 
+            // stepLabel
+            // 
+            this.stepLabel.AutoSize = true;
+            this.stepLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.stepLabel.Location = new System.Drawing.Point(233, 163);
+            this.stepLabel.Name = "stepLabel";
+            this.stepLabel.Size = new System.Drawing.Size(51, 20);
+            this.stepLabel.TabIndex = 2;
+            this.stepLabel.Text = "label1";
+            // 
+            // workingFileLabel
+            // 
+            this.workingFileLabel.AutoSize = true;
+            this.workingFileLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.workingFileLabel.Location = new System.Drawing.Point(237, 243);
+            this.workingFileLabel.Name = "workingFileLabel";
+            this.workingFileLabel.Size = new System.Drawing.Size(46, 17);
+            this.workingFileLabel.TabIndex = 3;
+            this.workingFileLabel.Text = "label1";
             // 
             // MainInstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(539, 430);
+            this.Controls.Add(this.installerProgressPanel);
             this.Controls.Add(this.mainInstallPanel);
             this.Controls.Add(this.nextButton);
             this.Name = "MainInstaller";
@@ -281,8 +373,10 @@
             this.mainInstallPanel.PerformLayout();
             this.nonEmptyInstallWarningPanel.ResumeLayout(false);
             this.nonEmptyInstallWarningPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainInstallerBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
+            this.existingModsFolderLabel.ResumeLayout(false);
+            this.existingModsFolderLabel.PerformLayout();
+            this.installerProgressPanel.ResumeLayout(false);
+            this.installerProgressPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -290,12 +384,10 @@
         #endregion
 
         private System.Windows.Forms.Label mainLabel;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label installDesc;
         private System.Windows.Forms.TextBox pathBox;
         private System.Windows.Forms.Button browseButton;
         private System.Windows.Forms.Button nextButton;
-        private System.Windows.Forms.BindingSource mainInstallerBindingSource;
-        private System.Windows.Forms.BindingSource bindingSource1;
         private System.Windows.Forms.FolderBrowserDialog gameDialog;
         private System.Windows.Forms.Panel gameVersionWarning;
         private System.Windows.Forms.Label labelError;
@@ -305,12 +397,21 @@
         private System.Windows.Forms.TextBox installDirTextbox;
         private System.Windows.Forms.CheckBox createInstallCheck;
         private System.Windows.Forms.Label separateInstallDesc;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label separateInstallLabel;
         private System.Windows.Forms.Label sepInstallLabel;
         private System.Windows.Forms.Panel nonEmptyInstallWarningPanel;
         private System.Windows.Forms.Button warningButtonOk;
         private System.Windows.Forms.Label warningNonEmptyInstallDesc;
         private System.Windows.Forms.Label warningNonEmptyInstall;
+        private System.Windows.Forms.Panel existingModsFolderLabel;
+        private System.Windows.Forms.Label existingModsWarningDesc;
+        private System.Windows.Forms.Label warningExistingMods;
+        private System.Windows.Forms.Button existingModsButtonOk;
+        private System.Windows.Forms.Panel installerProgressPanel;
+        private System.Windows.Forms.Label installingDFLabel;
+        private System.Windows.Forms.ProgressBar installProgressBar;
+        private System.Windows.Forms.Label stepLabel;
+        private System.Windows.Forms.Label workingFileLabel;
     }
 }
 

@@ -16,6 +16,11 @@ using System.Xml.Linq;
 namespace DarknessFallsInstaller {
     public partial class MainInstaller : Form {
 
+        public string StatusText {
+            get => workingFileLabel.Text;
+            set => workingFileLabel.Text = value;
+        }
+
         public InstallData Installer;
 
         public MainInstaller() {
@@ -29,13 +34,16 @@ namespace DarknessFallsInstaller {
             buttonBrowseSepInstall.Visible = false;
             sepInstallLabel.Visible = false;
             nonEmptyInstallWarningPanel.Hide();
+            existingModsFolderLabel.Hide();
             labelError.Text = string.Format("ERROR\r\nThe game installation you have selected is \r\nincompatible with Darkness Falls. Please select\r\nan install of 7 Days To Die version {0}.\r\n", ConfigurationManager.AppSettings.Get("7D2DVersion"));
+            installerProgressPanel.Hide();
         }
 
         private void SetupBindings() {
             pathBox.DataBindings.Clear();
             pathBox.DataBindings.Add(nameof(TextBox.Text), Installer, nameof(Installer.InstallDir), true, DataSourceUpdateMode.OnPropertyChanged);
             installDirTextbox.DataBindings.Add(nameof(TextBox.Text), Installer, nameof(Installer.NewInstallDir), true, DataSourceUpdateMode.OnPropertyChanged);
+            workingFileLabel.DataBindings.Add(nameof(Label.Text), Installer, nameof(Installer.WorkingFile), true, DataSourceUpdateMode.OnPropertyChanged);
         }
 
         private void Form1_Load(object sender, EventArgs e) {
@@ -66,14 +74,9 @@ namespace DarknessFallsInstaller {
                 Installer.InstallDir = path;
             }
             gameVersionWarning.Visible = !Installer.IsGameVersionValid;
-        }
-
-        private void nextButton_Click(object sender, EventArgs e) {
-            mainInstallPanel.Hide();
-        }
-
-        private void okButton_Click(object sender, EventArgs e) {
-            gameVersionWarning.Hide();
+            if (!gameVersionWarning.Visible) {
+                warningExistingMods.Visible = Installer.CheckForPreviousMods();
+            }
         }
 
         private void createInstallCheck_CheckedChanged(object sender, EventArgs e) {
@@ -106,6 +109,50 @@ namespace DarknessFallsInstaller {
 
         private void warningButtonOk_Click(object sender, EventArgs e) {
             nonEmptyInstallWarningPanel.Hide();
+        }
+
+        private async void nextButton_Click(object sender, EventArgs e) {
+            mainInstallPanel.Hide();
+            installerProgressPanel.Show();
+            var progress = new Progress<int>(v => {
+                installProgressBar.Value = v;
+            });
+            
+            if (createInstallCheck.Checked) {
+                await Task.Run(() => {
+                    //Do copy install
+                    stepLabel.Invoke((MethodInvoker)delegate {
+                        stepLabel.Text = "Cleaning install folder.";
+                    });
+
+                    Installer.CleanInstallFolder();
+                    installProgressBar.Value = 0;
+
+                    stepLabel.Invoke((MethodInvoker)delegate {
+                        stepLabel.Text = "Copying game files.";
+                    });
+                    Installer.CloneBaseGame(progress);
+                    installProgressBar.Value = 0;
+
+                    stepLabel.Invoke((MethodInvoker)delegate {
+                        stepLabel.Text = "Installing Darkness Falls files.";
+                    });
+
+                    Installer.InstallModFiles(progress);
+                });
+            }
+            else {
+                // Do basic install
+                Installer.RemoveExistingMods();
+            }
+        }
+
+        private void okButton_Click(object sender, EventArgs e) {
+            gameVersionWarning.Hide();
+        }
+
+        private void existingModsButtonOk_Click(object sender, EventArgs e) {
+            existingModsFolderLabel.Hide();
         }
     }
 }
