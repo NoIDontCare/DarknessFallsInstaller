@@ -16,16 +16,12 @@ using System.Xml.Linq;
 namespace DarknessFallsInstaller {
     public partial class MainInstaller : Form {
 
-        public string StatusText {
-            get => workingFileLabel.Text;
-            set => workingFileLabel.Text = value;
-        }
-
         public InstallData Installer;
 
         public MainInstaller() {
             Installer = new InstallData();
             InitializeComponent();
+            CenterToScreen();
             gameVersionWarning.Hide();
             SetupBindings();
             GetDefaultFolderLocation();
@@ -43,7 +39,6 @@ namespace DarknessFallsInstaller {
             pathBox.DataBindings.Clear();
             pathBox.DataBindings.Add(nameof(TextBox.Text), Installer, nameof(Installer.InstallDir), true, DataSourceUpdateMode.OnPropertyChanged);
             installDirTextbox.DataBindings.Add(nameof(TextBox.Text), Installer, nameof(Installer.NewInstallDir), true, DataSourceUpdateMode.OnPropertyChanged);
-            workingFileLabel.DataBindings.Add(nameof(Label.Text), Installer, nameof(Installer.WorkingFile), true, DataSourceUpdateMode.OnPropertyChanged);
         }
 
         private void Form1_Load(object sender, EventArgs e) {
@@ -112,12 +107,22 @@ namespace DarknessFallsInstaller {
         }
 
         private async void nextButton_Click(object sender, EventArgs e) {
+            gameVersionWarning.Visible = !Installer.IsGameVersionValid;
+            if (gameVersionWarning.Visible) {
+                return;
+            }
             mainInstallPanel.Hide();
             installerProgressPanel.Show();
             var progress = new Progress<int>(v => {
                 installProgressBar.Value = v;
             });
-            
+
+            var progressString = new Progress<string>(v => {
+                workingFileLabel.Text = v;
+            });
+
+            nextButton.Enabled = false;
+
             if (createInstallCheck.Checked) {
                 await Task.Run(() => {
                     //Do copy install
@@ -125,20 +130,23 @@ namespace DarknessFallsInstaller {
                         stepLabel.Text = "Cleaning install folder.";
                     });
 
-                    Installer.CleanInstallFolder();
+                    Installer.CleanInstallFolder(progressString);
                     installProgressBar.Value = 0;
 
                     stepLabel.Invoke((MethodInvoker)delegate {
                         stepLabel.Text = "Copying game files.";
                     });
-                    Installer.CloneBaseGame(progress);
+                    actionLabel.Invoke((MethodInvoker)delegate {
+                        actionLabel.Text = "Copying ";
+                    });
+                    Installer.CloneBaseGame(progress, progressString);
                     installProgressBar.Value = 0;
 
                     stepLabel.Invoke((MethodInvoker)delegate {
                         stepLabel.Text = "Installing Darkness Falls files.";
                     });
 
-                    Installer.InstallModFiles(progress);
+                    Installer.InstallModFiles(progress, progressString);
                 });
             }
             else {

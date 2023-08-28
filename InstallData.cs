@@ -66,39 +66,43 @@ namespace DarknessFallsInstaller {
             return files == null;
         }
 
-        public void CleanInstallFolder() {
+        public void CleanInstallFolder(IProgress<string> workingFile) {
             DirectoryInfo directory = new DirectoryInfo(NewInstallDir);
 
             foreach (FileInfo file in directory.GetFiles()) {
-                WorkingFile = "Copying " + file.Name;
+                workingFile.Report(file.Name);
                 file.Delete();
             }
 
             foreach (DirectoryInfo dir in directory.GetDirectories()) {
+                workingFile.Report(dir.Name);
                 dir.Delete(true);
             }
         }
 
-        public void CloneBaseGame(IProgress<int> progress) {
+        public void CloneBaseGame(IProgress<int> progress, IProgress<string> workingFile) {
 
             int i = 0;
             int total = Directory.GetFiles(InstallDir, "*.*", SearchOption.AllDirectories).Length;
 
             foreach (string dirPath in Directory.GetDirectories(InstallDir, "*", SearchOption.AllDirectories)) {
-                if (dirPath.Substring(dirPath.Length - 4, 4).Equals("Mods")) continue;
+                //if (dirPath.Substring(dirPath.Length - 4, 4).Equals("Mods")) continue;
+                
+                if (Path.GetDirectoryName(dirPath) == InstallDir + "\\Mods") continue;
+
                 Directory.CreateDirectory(dirPath.Replace(InstallDir, NewInstallDir));
             }
 
             foreach (string newPath in Directory.GetFiles(InstallDir, "*.*", SearchOption.AllDirectories)) {
-                //if (newPath.Contains("Mods")) continue;
+                if (Path.GetDirectoryName(newPath) == "Mods") continue;
+                workingFile.Report(newPath);
                 File.Copy(newPath, newPath.Replace(InstallDir, NewInstallDir), true);
-                WorkingFile = "Copying " + newPath;
                 progress.Report((i + 1) * 100 / total);
                 i++;
             }
         }
 
-        public void InstallModFiles(IProgress<int> progress) {
+        public void InstallModFiles(IProgress<int> progress, IProgress<string> workingFile) {
 
             int i = 0;
             int total = Directory.GetFiles(modFiles, "*.*", SearchOption.AllDirectories).Length;
@@ -108,8 +112,9 @@ namespace DarknessFallsInstaller {
             }
 
             foreach (string newPath in Directory.GetFiles(modFiles, "*.*", SearchOption.AllDirectories)) {
+                
+                workingFile.Report(newPath);
                 File.Copy(newPath, newPath.Replace(modFiles, NewInstallDir), true);
-                WorkingFile = "Copying " + newPath;
                 progress.Report((i + 1) * 100 / total);
                 i++;
             }
