@@ -55,11 +55,17 @@
             this.installProgressBar = new System.Windows.Forms.ProgressBar();
             this.actionLabel = new System.Windows.Forms.Label();
             this.installingDesc = new System.Windows.Forms.Label();
+            this.appdataModsWarningPanel = new System.Windows.Forms.Panel();
+            this.appdataModsWarningHeader = new System.Windows.Forms.Label();
+            this.appdataModsWarningDesc = new System.Windows.Forms.Label();
+            this.appdataModsWarningButtonYes = new System.Windows.Forms.Button();
+            this.appdataModsWarningButtonNo = new System.Windows.Forms.Button();
             this.gameVersionWarning.SuspendLayout();
             this.mainInstallPanel.SuspendLayout();
             this.existingModsFolderLabel.SuspendLayout();
             this.nonEmptyInstallWarningPanel.SuspendLayout();
             this.installerProgressPanel.SuspendLayout();
+            this.appdataModsWarningPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainLabel
@@ -148,8 +154,8 @@
             // 
             // mainInstallPanel
             // 
-            this.mainInstallPanel.Controls.Add(this.gameVersionWarning);
             this.mainInstallPanel.Controls.Add(this.existingModsFolderLabel);
+            this.mainInstallPanel.Controls.Add(this.gameVersionWarning);
             this.mainInstallPanel.Controls.Add(this.nonEmptyInstallWarningPanel);
             this.mainInstallPanel.Controls.Add(this.separateInstallDesc);
             this.mainInstallPanel.Controls.Add(this.separateInstallLabel);
@@ -173,13 +179,15 @@
             this.existingModsFolderLabel.Controls.Add(this.warningExistingMods);
             this.existingModsFolderLabel.Location = new System.Drawing.Point(61, 35);
             this.existingModsFolderLabel.Name = "existingModsFolderLabel";
+            this.existingModsFolderLabel.Padding = new System.Windows.Forms.Padding(20);
             this.existingModsFolderLabel.Size = new System.Drawing.Size(379, 169);
             this.existingModsFolderLabel.TabIndex = 8;
+            this.existingModsFolderLabel.Paint += new System.Windows.Forms.PaintEventHandler(this.existingModsFolderLabel_Paint);
             // 
             // existingModsButtonOk
             // 
             this.existingModsButtonOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.existingModsButtonOk.Location = new System.Drawing.Point(151, 119);
+            this.existingModsButtonOk.Location = new System.Drawing.Point(140, 133);
             this.existingModsButtonOk.Name = "existingModsButtonOk";
             this.existingModsButtonOk.Size = new System.Drawing.Size(75, 28);
             this.existingModsButtonOk.TabIndex = 2;
@@ -191,19 +199,19 @@
             // 
             this.existingModsWarningDesc.AutoSize = true;
             this.existingModsWarningDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.existingModsWarningDesc.Location = new System.Drawing.Point(3, 45);
+            this.existingModsWarningDesc.Location = new System.Drawing.Point(27, 52);
             this.existingModsWarningDesc.Name = "existingModsWarningDesc";
-            this.existingModsWarningDesc.Size = new System.Drawing.Size(376, 51);
+            this.existingModsWarningDesc.Size = new System.Drawing.Size(316, 68);
             this.existingModsWarningDesc.TabIndex = 1;
-            this.existingModsWarningDesc.Text = "An existing mods folder was found in this game install.\r\nIf you do not choose to " +
-    "create a separate install, this mods\r\nfolder will be removed before Darkness Fal" +
-    "ls is installed.";
+            this.existingModsWarningDesc.Text = "An existing mods folder was found in this game \r\ninstall. If you do not choose to" +
+    " create a separate \r\ninstall, this mods folder will be removed before \r\nDarkness" +
+    " Falls is installed.";
             // 
             // warningExistingMods
             // 
             this.warningExistingMods.AutoSize = true;
             this.warningExistingMods.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.warningExistingMods.Location = new System.Drawing.Point(134, 9);
+            this.warningExistingMods.Location = new System.Drawing.Point(134, 16);
             this.warningExistingMods.Name = "warningExistingMods";
             this.warningExistingMods.Size = new System.Drawing.Size(114, 31);
             this.warningExistingMods.TabIndex = 0;
@@ -311,6 +319,7 @@
             // 
             // installerProgressPanel
             // 
+            this.installerProgressPanel.Controls.Add(this.appdataModsWarningPanel);
             this.installerProgressPanel.Controls.Add(this.installingDesc);
             this.installerProgressPanel.Controls.Add(this.actionLabel);
             this.installerProgressPanel.Controls.Add(this.workingFileLabel);
@@ -336,11 +345,10 @@
             // 
             // stepLabel
             // 
-            this.stepLabel.AutoSize = true;
             this.stepLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stepLabel.Location = new System.Drawing.Point(303, 166);
+            this.stepLabel.Location = new System.Drawing.Point(210, 166);
             this.stepLabel.Name = "stepLabel";
-            this.stepLabel.Size = new System.Drawing.Size(51, 20);
+            this.stepLabel.Size = new System.Drawing.Size(194, 20);
             this.stepLabel.TabIndex = 2;
             this.stepLabel.Text = "label1";
             this.stepLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -384,13 +392,68 @@
             this.installingDesc.Text = "Darkness Falls is being installed. This process may take a while. New game\r\ninsta" +
     "llations will take longer.";
             // 
+            // appdataModsWarningPanel
+            // 
+            this.appdataModsWarningPanel.Controls.Add(this.appdataModsWarningButtonNo);
+            this.appdataModsWarningPanel.Controls.Add(this.appdataModsWarningButtonYes);
+            this.appdataModsWarningPanel.Controls.Add(this.appdataModsWarningDesc);
+            this.appdataModsWarningPanel.Controls.Add(this.appdataModsWarningHeader);
+            this.appdataModsWarningPanel.Location = new System.Drawing.Point(132, 69);
+            this.appdataModsWarningPanel.Name = "appdataModsWarningPanel";
+            this.appdataModsWarningPanel.Size = new System.Drawing.Size(379, 178);
+            this.appdataModsWarningPanel.TabIndex = 12;
+            // 
+            // appdataModsWarningHeader
+            // 
+            this.appdataModsWarningHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appdataModsWarningHeader.Location = new System.Drawing.Point(134, 9);
+            this.appdataModsWarningHeader.Name = "appdataModsWarningHeader";
+            this.appdataModsWarningHeader.Size = new System.Drawing.Size(114, 31);
+            this.appdataModsWarningHeader.TabIndex = 0;
+            this.appdataModsWarningHeader.Text = "Warning";
+            // 
+            // appdataModsWarningDesc
+            // 
+            this.appdataModsWarningDesc.AutoSize = true;
+            this.appdataModsWarningDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appdataModsWarningDesc.Location = new System.Drawing.Point(22, 45);
+            this.appdataModsWarningDesc.Name = "appdataModsWarningDesc";
+            this.appdataModsWarningDesc.Size = new System.Drawing.Size(334, 85);
+            this.appdataModsWarningDesc.TabIndex = 1;
+            this.appdataModsWarningDesc.Text = "A mods folder was located in the userdata folder.\r\nThese mods are likely not comp" +
+    "atible with Darkness\r\nFalls and are likely to cause issues.\r\n\r\nWould you like to" +
+    " remove this mods folder now?";
+            this.appdataModsWarningDesc.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // appdataModsWarningButtonYes
+            // 
+            this.appdataModsWarningButtonYes.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appdataModsWarningButtonYes.Location = new System.Drawing.Point(59, 138);
+            this.appdataModsWarningButtonYes.Name = "appdataModsWarningButtonYes";
+            this.appdataModsWarningButtonYes.Size = new System.Drawing.Size(75, 31);
+            this.appdataModsWarningButtonYes.TabIndex = 2;
+            this.appdataModsWarningButtonYes.Text = "Yes";
+            this.appdataModsWarningButtonYes.UseVisualStyleBackColor = true;
+            this.appdataModsWarningButtonYes.Click += new System.EventHandler(this.appdataModsWarningButtonYes_Click);
+            // 
+            // appdataModsWarningButtonNo
+            // 
+            this.appdataModsWarningButtonNo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appdataModsWarningButtonNo.Location = new System.Drawing.Point(221, 138);
+            this.appdataModsWarningButtonNo.Name = "appdataModsWarningButtonNo";
+            this.appdataModsWarningButtonNo.Size = new System.Drawing.Size(75, 31);
+            this.appdataModsWarningButtonNo.TabIndex = 3;
+            this.appdataModsWarningButtonNo.Text = "No";
+            this.appdataModsWarningButtonNo.UseVisualStyleBackColor = true;
+            this.appdataModsWarningButtonNo.Click += new System.EventHandler(this.appdataModsWarningButtonNo_Click);
+            // 
             // MainInstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(650, 430);
-            this.Controls.Add(this.mainInstallPanel);
             this.Controls.Add(this.installerProgressPanel);
+            this.Controls.Add(this.mainInstallPanel);
             this.Controls.Add(this.nextButton);
             this.Name = "MainInstaller";
             this.Text = "Install Darkness Falls";
@@ -405,6 +468,8 @@
             this.nonEmptyInstallWarningPanel.PerformLayout();
             this.installerProgressPanel.ResumeLayout(false);
             this.installerProgressPanel.PerformLayout();
+            this.appdataModsWarningPanel.ResumeLayout(false);
+            this.appdataModsWarningPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -442,6 +507,11 @@
         private System.Windows.Forms.Label workingFileLabel;
         private System.Windows.Forms.Label actionLabel;
         private System.Windows.Forms.Label installingDesc;
+        private System.Windows.Forms.Panel appdataModsWarningPanel;
+        private System.Windows.Forms.Button appdataModsWarningButtonYes;
+        private System.Windows.Forms.Label appdataModsWarningDesc;
+        private System.Windows.Forms.Label appdataModsWarningHeader;
+        private System.Windows.Forms.Button appdataModsWarningButtonNo;
     }
 }
 

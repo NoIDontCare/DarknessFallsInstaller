@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -22,8 +23,6 @@ namespace DarknessFallsInstaller {
         public bool IsComplete { get; set; }
         public bool IsNewInstall { get; set; }
 
-        public string WorkingFile { get => _workingFile; set { _workingFile = value; OnPropertyChanged("WorkingFile"); } }
-
         public string NewInstallDir { get => _newInstallDir; set { _newInstallDir = value; OnPropertyChanged("NewInstallDir"); } }
 
         public bool IsGameVersionValid { get => _isGameVersionCorrect; set { _isGameVersionCorrect = value; OnPropertyChanged("IsGameVersionValid"); } }
@@ -31,14 +30,12 @@ namespace DarknessFallsInstaller {
         private string _installDir;
         private string _newInstallDir;
         private bool _isGameVersionCorrect;
-        private string _workingFile;
 
         public InstallData(string installDir = "", bool isComplete = false, bool isNewInstall = false) {
             InstallDir = installDir;
             IsComplete = isComplete;
             IsNewInstall = isNewInstall;
             IsGameVersionValid = false;
-            WorkingFile = string.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -85,16 +82,14 @@ namespace DarknessFallsInstaller {
             int i = 0;
             int total = Directory.GetFiles(InstallDir, "*.*", SearchOption.AllDirectories).Length;
 
-            foreach (string dirPath in Directory.GetDirectories(InstallDir, "*", SearchOption.AllDirectories)) {
-                //if (dirPath.Substring(dirPath.Length - 4, 4).Equals("Mods")) continue;
-                
-                if (Path.GetDirectoryName(dirPath) == InstallDir + "\\Mods") continue;
+            foreach (string dirPath in Directory.GetDirectories(InstallDir, "*", SearchOption.AllDirectories)) {  
+                if (Path.GetDirectoryName(dirPath).Contains("Mods")) continue;
 
                 Directory.CreateDirectory(dirPath.Replace(InstallDir, NewInstallDir));
             }
 
             foreach (string newPath in Directory.GetFiles(InstallDir, "*.*", SearchOption.AllDirectories)) {
-                if (Path.GetDirectoryName(newPath) == "Mods") continue;
+                if (Path.GetDirectoryName(newPath).Contains("Mods")) continue;
                 workingFile.Report(newPath);
                 File.Copy(newPath, newPath.Replace(InstallDir, NewInstallDir), true);
                 progress.Report((i + 1) * 100 / total);
@@ -117,6 +112,24 @@ namespace DarknessFallsInstaller {
                 File.Copy(newPath, newPath.Replace(modFiles, NewInstallDir), true);
                 progress.Report((i + 1) * 100 / total);
                 i++;
+            }
+        }
+
+        public bool DoesAppdataHaveMods() {
+            var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\7DaysToDie\\Mods";
+            return Directory.Exists(appdataPath);
+        }
+
+        public void CleanAppdataModsFolder() {
+            var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\7DaysToDie\\Mods";
+            DirectoryInfo directory = new DirectoryInfo(appdataPath);
+
+            foreach (FileInfo file in directory.GetFiles()) {
+                file.Delete();
+            }
+
+            foreach (DirectoryInfo dir in directory.GetDirectories()) {
+                dir.Delete(true);
             }
         }
 
