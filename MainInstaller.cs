@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using IWshRuntimeLibrary;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -36,6 +38,8 @@ namespace DarknessFallsInstaller {
             labelError.Text = string.Format("ERROR\r\nThe game installation you have selected is \r\nincompatible with Darkness Falls. Please select\r\nan install of 7 Days To Die version {0}.\r\n", ConfigurationManager.AppSettings.Get("7D2DVersion"));
             installerProgressPanel.Hide();
             appdataModsWarningPanel.Hide();
+            installFinishedPanel.Hide();
+            closeButton.Hide();
         }
 
         private void SetupBindings() {
@@ -134,7 +138,7 @@ namespace DarknessFallsInstaller {
 
             if (createInstallCheck.Checked) {
                 await Task.Run(() => {
-                    //Do copy install
+
                     stepLabel.Invoke((MethodInvoker)delegate {
                         stepLabel.Text = "Cleaning install folder.";
                     });
@@ -161,24 +165,29 @@ namespace DarknessFallsInstaller {
                         stepLabel.Text = "Installing Darkness Falls files.";
                     });
 
-                    Installer.InstallModFiles(progress, progressString);
+                    Installer.InstallModFiles(progress, progressString, Installer.NewInstallDir);
                 });
+                installerProgressPanel.Hide();
+                installFinishedPanel.Show();
+                nextButton.Hide();
+                closeButton.Show();
+                CreateShortcut("Darkness Falls", Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Installer.NewInstallDir + "\\7DaysToDie.exe", Installer.NewInstallDir);
             }
-            else {                
+            else {
                 await Task.Run(() => {
-                    //Do basic install
 
                     stepLabel.Invoke((MethodInvoker)delegate {
                         stepLabel.Text = "Cleaning existing mods folder.";
                     });
 
-                    Installer.RemoveExistingMods();
+                    if (Installer.CheckForPreviousMods()) {
+                        Installer.RemoveExistingMods();
+                    }
 
                     actionLabel.Invoke((MethodInvoker)delegate {
                         actionLabel.Text = "Copying ";
                     });
 
-                    Installer.CloneBaseGame(progress, progressString);
                     installProgressBar.Invoke((MethodInvoker)delegate {
                         installProgressBar.Value = 0;
                     });
@@ -187,8 +196,12 @@ namespace DarknessFallsInstaller {
                         stepLabel.Text = "Installing Darkness Falls files.";
                     });
 
-                    Installer.InstallModFiles(progress, progressString);
+                    Installer.InstallModFiles(progress, progressString, Installer.InstallDir);
                 });
+                installerProgressPanel.Hide();
+                installFinishedPanel.Show();
+                nextButton.Hide();
+                closeButton.Show();
             }
         }
 
@@ -204,14 +217,34 @@ namespace DarknessFallsInstaller {
             ControlPaint.DrawBorder(e.Graphics, this.existingModsFolderLabel.ClientRectangle, Color.DarkBlue, ButtonBorderStyle.Solid);
         }
 
-        private void appdataModsWarningButtonYes_Click(object sender, EventArgs e) {
+        private async void appdataModsWarningButtonYes_Click(object sender, EventArgs e) {
             appdataModsWarningPanel.Hide();
             TaskCompletionSource.SetResult(false);
+            await Installer.CleanAppdataModsFolder();
         }
 
         private void appdataModsWarningButtonNo_Click(object sender, EventArgs e) {
             appdataModsWarningPanel.Hide();
             TaskCompletionSource.SetResult(false);
+        }
+
+        private void appdataModsWarningPanel_Paint(object sender, PaintEventArgs e) {
+            ControlPaint.DrawBorder(e.Graphics, this.existingModsFolderLabel.ClientRectangle, Color.DarkBlue, ButtonBorderStyle.Solid);
+        }
+
+        private void closeButton_Click(object sender, EventArgs e) {
+            Application.Exit();
+        }
+
+        public static void CreateShortcut(string shortcutName, string shortcutPath, string targetFileLocation, string iconpath) {
+            string shortcutLocation = Path.Combine(shortcutPath, shortcutName + ".lnk");
+            WshShell shell = new WshShell();
+            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutLocation);
+
+            shortcut.Description = "7D2D Darkness Falls";
+            shortcut.IconLocation = iconpath + ".\\darknessfalls.ico"; 
+            shortcut.TargetPath = targetFileLocation; 
+            shortcut.Save();     
         }
     }
 }

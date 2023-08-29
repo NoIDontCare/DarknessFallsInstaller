@@ -6,9 +6,9 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using Label = System.Windows.Forms.Label;
 
 namespace DarknessFallsInstaller {
     public class InstallData : INotifyPropertyChanged {
@@ -17,7 +17,7 @@ namespace DarknessFallsInstaller {
             "TFP_CommandExtensions", "TFP_MapRendering", "TFP_WebServer", "Xample_MarkersMod"
         };
 
-        static string modFiles = ".\\ModFiles";
+        static string modFiles = ".\\Mods";
 
         public string InstallDir { get => _installDir; set { _installDir = value; OnPropertyChanged("InstallDir"); IsGameVersionCorrect(); } }
         public bool IsComplete { get; set; }
@@ -50,10 +50,16 @@ namespace DarknessFallsInstaller {
 
         public void RemoveExistingMods() {
 
-            foreach (var subDir in new DirectoryInfo(InstallDir).GetDirectories()) {
-                if (!allowedMods.Contains(subDir.Name)) {
-                    subDir.Delete(true);
-                }
+            DirectoryInfo directory = new DirectoryInfo(InstallDir + "\\Mods");
+
+            foreach (FileInfo file in directory.GetFiles()) {
+                //workingFile.Report(file.Name);
+                file.Delete();
+            }
+
+            foreach (DirectoryInfo dir in directory.GetDirectories()) {
+                //workingFile.Report(dir.Name);
+                dir.Delete(true);
             }
         }
 
@@ -97,22 +103,23 @@ namespace DarknessFallsInstaller {
             }
         }
 
-        public void InstallModFiles(IProgress<int> progress, IProgress<string> workingFile) {
+        public void InstallModFiles(IProgress<int> progress, IProgress<string> workingFile, string location) {
 
             int i = 0;
             int total = Directory.GetFiles(modFiles, "*.*", SearchOption.AllDirectories).Length;
 
             foreach (string dirPath in Directory.GetDirectories(modFiles, "*", SearchOption.AllDirectories)) {
-                Directory.CreateDirectory(dirPath.Replace(modFiles, NewInstallDir));
+                Directory.CreateDirectory(dirPath.Replace(modFiles, location + "\\Mods"));
             }
 
             foreach (string newPath in Directory.GetFiles(modFiles, "*.*", SearchOption.AllDirectories)) {
                 
                 workingFile.Report(newPath);
-                File.Copy(newPath, newPath.Replace(modFiles, NewInstallDir), true);
+                File.Copy(newPath, newPath.Replace(modFiles, location + "\\Mods"), true);
                 progress.Report((i + 1) * 100 / total);
                 i++;
             }
+            File.Copy(".\\darknessfalls.ico", location + "\\darknessfalls.ico", true);
         }
 
         public bool DoesAppdataHaveMods() {
@@ -120,17 +127,19 @@ namespace DarknessFallsInstaller {
             return Directory.Exists(appdataPath);
         }
 
-        public void CleanAppdataModsFolder() {
-            var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\7DaysToDie\\Mods";
-            DirectoryInfo directory = new DirectoryInfo(appdataPath);
+        public Task CleanAppdataModsFolder() {
+            return Task.Run(() => {
+                var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\7DaysToDie\\Mods";
+                DirectoryInfo directory = new DirectoryInfo(appdataPath);
 
-            foreach (FileInfo file in directory.GetFiles()) {
-                file.Delete();
-            }
+                foreach (FileInfo file in directory.GetFiles()) {
+                    file.Delete();
+                }
 
-            foreach (DirectoryInfo dir in directory.GetDirectories()) {
-                dir.Delete(true);
-            }
+                foreach (DirectoryInfo dir in directory.GetDirectories()) {
+                    dir.Delete(true);
+                }
+            });
         }
 
         private void IsGameVersionCorrect() {

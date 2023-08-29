@@ -60,12 +60,18 @@
             this.appdataModsWarningDesc = new System.Windows.Forms.Label();
             this.appdataModsWarningButtonYes = new System.Windows.Forms.Button();
             this.appdataModsWarningButtonNo = new System.Windows.Forms.Button();
+            this.installFinishedPanel = new System.Windows.Forms.Panel();
+            this.headerInstallComplete = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.installCompleteDesc = new System.Windows.Forms.Label();
+            this.closeButton = new System.Windows.Forms.Button();
             this.gameVersionWarning.SuspendLayout();
             this.mainInstallPanel.SuspendLayout();
             this.existingModsFolderLabel.SuspendLayout();
             this.nonEmptyInstallWarningPanel.SuspendLayout();
             this.installerProgressPanel.SuspendLayout();
             this.appdataModsWarningPanel.SuspendLayout();
+            this.installFinishedPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainLabel
@@ -111,7 +117,7 @@
             // nextButton
             // 
             this.nextButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nextButton.Location = new System.Drawing.Point(413, 390);
+            this.nextButton.Location = new System.Drawing.Point(548, 390);
             this.nextButton.Name = "nextButton";
             this.nextButton.Size = new System.Drawing.Size(90, 28);
             this.nextButton.TabIndex = 4;
@@ -402,6 +408,7 @@
             this.appdataModsWarningPanel.Name = "appdataModsWarningPanel";
             this.appdataModsWarningPanel.Size = new System.Drawing.Size(379, 178);
             this.appdataModsWarningPanel.TabIndex = 12;
+            this.appdataModsWarningPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.appdataModsWarningPanel_Paint);
             // 
             // appdataModsWarningHeader
             // 
@@ -447,11 +454,64 @@
             this.appdataModsWarningButtonNo.UseVisualStyleBackColor = true;
             this.appdataModsWarningButtonNo.Click += new System.EventHandler(this.appdataModsWarningButtonNo_Click);
             // 
+            // installFinishedPanel
+            // 
+            this.installFinishedPanel.Controls.Add(this.installCompleteDesc);
+            this.installFinishedPanel.Controls.Add(this.headerInstallComplete);
+            this.installFinishedPanel.Controls.Add(this.panel1);
+            this.installFinishedPanel.Location = new System.Drawing.Point(0, 0);
+            this.installFinishedPanel.Name = "installFinishedPanel";
+            this.installFinishedPanel.Size = new System.Drawing.Size(646, 369);
+            this.installFinishedPanel.TabIndex = 8;
+            // 
+            // headerInstallComplete
+            // 
+            this.headerInstallComplete.AutoSize = true;
+            this.headerInstallComplete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.headerInstallComplete.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.headerInstallComplete.Location = new System.Drawing.Point(14, 32);
+            this.headerInstallComplete.Name = "headerInstallComplete";
+            this.headerInstallComplete.Size = new System.Drawing.Size(209, 31);
+            this.headerInstallComplete.TabIndex = 0;
+            this.headerInstallComplete.Text = "Install Complete";
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(646, 100);
+            this.panel1.TabIndex = 1;
+            // 
+            // installCompleteDesc
+            // 
+            this.installCompleteDesc.AutoSize = true;
+            this.installCompleteDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.installCompleteDesc.Location = new System.Drawing.Point(16, 121);
+            this.installCompleteDesc.Name = "installCompleteDesc";
+            this.installCompleteDesc.Size = new System.Drawing.Size(596, 40);
+            this.installCompleteDesc.TabIndex = 2;
+            this.installCompleteDesc.Text = "Darkness Falls is now intalled. To play, launch 7DaysToDie.exe located in the ins" +
+    "tall \r\ndirectory you chose. A shortcut has also been created on your desktop.\r\n";
+            // 
+            // closeButton
+            // 
+            this.closeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.closeButton.Location = new System.Drawing.Point(548, 390);
+            this.closeButton.Name = "closeButton";
+            this.closeButton.Size = new System.Drawing.Size(90, 28);
+            this.closeButton.TabIndex = 9;
+            this.closeButton.Text = "Close";
+            this.closeButton.UseVisualStyleBackColor = true;
+            this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
+            // 
             // MainInstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(650, 430);
+            this.Controls.Add(this.closeButton);
+            this.Controls.Add(this.installFinishedPanel);
             this.Controls.Add(this.installerProgressPanel);
             this.Controls.Add(this.mainInstallPanel);
             this.Controls.Add(this.nextButton);
@@ -470,6 +530,8 @@
             this.installerProgressPanel.PerformLayout();
             this.appdataModsWarningPanel.ResumeLayout(false);
             this.appdataModsWarningPanel.PerformLayout();
+            this.installFinishedPanel.ResumeLayout(false);
+            this.installFinishedPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -512,6 +574,11 @@
         private System.Windows.Forms.Label appdataModsWarningDesc;
         private System.Windows.Forms.Label appdataModsWarningHeader;
         private System.Windows.Forms.Button appdataModsWarningButtonNo;
+        private System.Windows.Forms.Panel installFinishedPanel;
+        private System.Windows.Forms.Label headerInstallComplete;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label installCompleteDesc;
+        private System.Windows.Forms.Button closeButton;
     }
 }
 
