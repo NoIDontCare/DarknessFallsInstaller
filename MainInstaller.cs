@@ -1,19 +1,11 @@
 ﻿using IWshRuntimeLibrary;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace DarknessFallsInstaller {
     public partial class MainInstaller : Form {
@@ -87,13 +79,11 @@ namespace DarknessFallsInstaller {
                 installDirTextbox.Show();
                 buttonBrowseSepInstall.Visible = true;
                 sepInstallLabel.Visible = true;
-                Installer.IsNewInstall = true;
             }
             else {
                 installDirTextbox.Hide();
                 buttonBrowseSepInstall.Visible = false;
                 sepInstallLabel.Visible = false;
-                Installer.IsNewInstall = false;
             }
         }
 
@@ -167,11 +157,7 @@ namespace DarknessFallsInstaller {
 
                     Installer.InstallModFiles(progress, progressString, Installer.NewInstallDir);
                 });
-                installerProgressPanel.Hide();
-                installFinishedPanel.Show();
-                nextButton.Hide();
-                closeButton.Show();
-                CreateShortcut("Darkness Falls", Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Installer.NewInstallDir + "\\7DaysToDie.exe", Installer.NewInstallDir);
+                FinishUp(Installer.NewInstallDir);
             }
             else {
                 await Task.Run(() => {
@@ -181,7 +167,10 @@ namespace DarknessFallsInstaller {
                     });
 
                     if (Installer.CheckForPreviousMods()) {
-                        Installer.RemoveExistingMods();
+                        actionLabel.Invoke((MethodInvoker)delegate {
+                            actionLabel.Text = "Deleting ";
+                        });
+                        Installer.RemoveExistingMods(progressString);
                     }
 
                     actionLabel.Invoke((MethodInvoker)delegate {
@@ -198,10 +187,7 @@ namespace DarknessFallsInstaller {
 
                     Installer.InstallModFiles(progress, progressString, Installer.InstallDir);
                 });
-                installerProgressPanel.Hide();
-                installFinishedPanel.Show();
-                nextButton.Hide();
-                closeButton.Show();
+                FinishUp(Installer.InstallDir);
             }
         }
 
@@ -236,14 +222,23 @@ namespace DarknessFallsInstaller {
             Application.Exit();
         }
 
-        public static void CreateShortcut(string shortcutName, string shortcutPath, string targetFileLocation, string iconpath) {
+        private void FinishUp(string location) {
+            installerProgressPanel.Hide();
+            installFinishedPanel.Show();
+            nextButton.Hide();
+            closeButton.Show();
+            CreateShortcut("Darkness Falls", Environment.GetFolderPath(Environment.SpecialFolder.Desktop), location + "\\7DaysToDie.exe", location);
+        }
+
+        private static void CreateShortcut(string shortcutName, string shortcutPath, string targetFileLocation, string iconpath) {
             string shortcutLocation = Path.Combine(shortcutPath, shortcutName + ".lnk");
             WshShell shell = new WshShell();
             IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutLocation);
-
             shortcut.Description = "7D2D Darkness Falls";
             shortcut.IconLocation = iconpath + ".\\darknessfalls.ico"; 
-            shortcut.TargetPath = targetFileLocation; 
+            shortcut.TargetPath = targetFileLocation;
+            shortcut.WorkingDirectory = iconpath;
+            shortcut.Arguments = "-noeac";
             shortcut.Save();     
         }
     }

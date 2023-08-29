@@ -1,13 +1,10 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace DarknessFallsInstaller {
@@ -20,21 +17,17 @@ namespace DarknessFallsInstaller {
         static string modFiles = ".\\Mods";
 
         public string InstallDir { get => _installDir; set { _installDir = value; OnPropertyChanged("InstallDir"); IsGameVersionCorrect(); } }
-        public bool IsComplete { get; set; }
-        public bool IsNewInstall { get; set; }
-
         public string NewInstallDir { get => _newInstallDir; set { _newInstallDir = value; OnPropertyChanged("NewInstallDir"); } }
-
         public bool IsGameVersionValid { get => _isGameVersionCorrect; set { _isGameVersionCorrect = value; OnPropertyChanged("IsGameVersionValid"); } }
+        public bool IsSteamGame { get => _isSteamGame; set => _isSteamGame = value; }
 
         private string _installDir;
         private string _newInstallDir;
         private bool _isGameVersionCorrect;
+        private bool _isSteamGame;
 
-        public InstallData(string installDir = "", bool isComplete = false, bool isNewInstall = false) {
+        public InstallData(string installDir = "") {
             InstallDir = installDir;
-            IsComplete = isComplete;
-            IsNewInstall = isNewInstall;
             IsGameVersionValid = false;
         }
 
@@ -48,17 +41,17 @@ namespace DarknessFallsInstaller {
             return Directory.Exists(InstallDir + "\\Mods");
         }
 
-        public void RemoveExistingMods() {
+        public void RemoveExistingMods(IProgress<string> workingFile) {
 
             DirectoryInfo directory = new DirectoryInfo(InstallDir + "\\Mods");
 
             foreach (FileInfo file in directory.GetFiles()) {
-                //workingFile.Report(file.Name);
+                workingFile.Report(file.Name);
                 file.Delete();
             }
 
             foreach (DirectoryInfo dir in directory.GetDirectories()) {
-                //workingFile.Report(dir.Name);
+                workingFile.Report(dir.Name);
                 dir.Delete(true);
             }
         }
@@ -119,7 +112,9 @@ namespace DarknessFallsInstaller {
                 progress.Report((i + 1) * 100 / total);
                 i++;
             }
-            File.Copy(".\\darknessfalls.ico", location + "\\darknessfalls.ico", true);
+            if (File.Exists(".\\darknessfalls.ico")) {
+                File.Copy(".\\darknessfalls.ico", location + "\\darknessfalls.ico", true);
+            }
         }
 
         public bool DoesAppdataHaveMods() {

@@ -65,6 +65,8 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.installCompleteDesc = new System.Windows.Forms.Label();
             this.closeButton = new System.Windows.Forms.Button();
+            this.backgroundInstallPanel = new System.Windows.Forms.Panel();
+            this.backgroundMenuPanel = new System.Windows.Forms.Panel();
             this.gameVersionWarning.SuspendLayout();
             this.mainInstallPanel.SuspendLayout();
             this.existingModsFolderLabel.SuspendLayout();
@@ -77,6 +79,7 @@
             // mainLabel
             // 
             this.mainLabel.AutoSize = true;
+            this.mainLabel.BackColor = System.Drawing.Color.Silver;
             this.mainLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.mainLabel.Location = new System.Drawing.Point(12, 9);
             this.mainLabel.Name = "mainLabel";
@@ -87,6 +90,7 @@
             // installDesc
             // 
             this.installDesc.AutoSize = true;
+            this.installDesc.BackColor = System.Drawing.Color.Silver;
             this.installDesc.Location = new System.Drawing.Point(13, 69);
             this.installDesc.Name = "installDesc";
             this.installDesc.Size = new System.Drawing.Size(489, 26);
@@ -173,6 +177,7 @@
             this.mainInstallPanel.Controls.Add(this.pathBox);
             this.mainInstallPanel.Controls.Add(this.installDesc);
             this.mainInstallPanel.Controls.Add(this.mainLabel);
+            this.mainInstallPanel.Controls.Add(this.backgroundMenuPanel);
             this.mainInstallPanel.Location = new System.Drawing.Point(0, 0);
             this.mainInstallPanel.Name = "mainInstallPanel";
             this.mainInstallPanel.Size = new System.Drawing.Size(649, 372);
@@ -331,6 +336,7 @@
             this.installerProgressPanel.Controls.Add(this.workingFileLabel);
             this.installerProgressPanel.Controls.Add(this.stepLabel);
             this.installerProgressPanel.Controls.Add(this.installingDFLabel);
+            this.installerProgressPanel.Controls.Add(this.backgroundInstallPanel);
             this.installerProgressPanel.Controls.Add(this.installProgressBar);
             this.installerProgressPanel.Location = new System.Drawing.Point(0, 0);
             this.installerProgressPanel.Name = "installerProgressPanel";
@@ -362,6 +368,7 @@
             // installingDFLabel
             // 
             this.installingDFLabel.AutoSize = true;
+            this.installingDFLabel.BackColor = System.Drawing.Color.Silver;
             this.installingDFLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.installingDFLabel.Location = new System.Drawing.Point(17, 10);
             this.installingDFLabel.Name = "installingDFLabel";
@@ -390,6 +397,7 @@
             // installingDesc
             // 
             this.installingDesc.AutoSize = true;
+            this.installingDesc.BackColor = System.Drawing.Color.Silver;
             this.installingDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.installingDesc.Location = new System.Drawing.Point(20, 51);
             this.installingDesc.Name = "installingDesc";
@@ -505,6 +513,22 @@
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
             // 
+            // backgroundInstallPanel
+            // 
+            this.backgroundInstallPanel.BackColor = System.Drawing.Color.Silver;
+            this.backgroundInstallPanel.Location = new System.Drawing.Point(0, 0);
+            this.backgroundInstallPanel.Name = "backgroundInstallPanel";
+            this.backgroundInstallPanel.Size = new System.Drawing.Size(649, 104);
+            this.backgroundInstallPanel.TabIndex = 13;
+            // 
+            // backgroundMenuPanel
+            // 
+            this.backgroundMenuPanel.BackColor = System.Drawing.Color.Silver;
+            this.backgroundMenuPanel.Location = new System.Drawing.Point(1, 1);
+            this.backgroundMenuPanel.Name = "backgroundMenuPanel";
+            this.backgroundMenuPanel.Size = new System.Drawing.Size(648, 100);
+            this.backgroundMenuPanel.TabIndex = 12;
+            // 
             // MainInstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -515,6 +539,7 @@
             this.Controls.Add(this.installerProgressPanel);
             this.Controls.Add(this.mainInstallPanel);
             this.Controls.Add(this.nextButton);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainInstaller";
             this.Text = "Install Darkness Falls";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -579,6 +604,8 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label installCompleteDesc;
         private System.Windows.Forms.Button closeButton;
+        private System.Windows.Forms.Panel backgroundMenuPanel;
+        private System.Windows.Forms.Panel backgroundInstallPanel;
     }
 }
 
